@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: spin-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=spin_transactions
+      - POSTGRES_USER=spin_user
+      - POSTGRES_PASSWORD=spin_password
+    ports:
+          - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+
