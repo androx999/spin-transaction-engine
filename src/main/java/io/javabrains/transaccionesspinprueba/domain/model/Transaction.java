@@ -25,4 +25,6 @@ public class Transaction {
     private BigDecimal balanceAfter;
 
     private Instant createdAt;
+
+    private String errorMessage;
 }
