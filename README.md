@@ -638,38 +638,7 @@ Integration Test
 
 ---
 
-# 15. Estado actual y mejoras pendientes
-
-El proyecto prioriza la implementación completa y testeada del flujo principal de creación de transacciones.
-
-Actualmente se encuentra implementado:
-
-- Creación de transacciones.
-- Validaciones de entrada.
-- Reglas de negocio.
-- Integración con proveedor mediante OpenFeign.
-- Manejo de operaciones aprobadas y rechazadas.
-- Persistencia PostgreSQL.
-- Migraciones Flyway.
-- Manejo global de errores.
-- Unit testing con Mockito.
-- Controller testing con MockMvc.
-- Integration testing con Testcontainers.
-
-Como mejoras posteriores se contempla:
-
-- Implementar `GET /transactions`.
-- Filtros opcionales por `accountId`, `status` y `type`.
-- Paginación mediante `page` y `limit`.
-- Incrementar cobertura de pruebas.
-- Agregar documentación OpenAPI/Swagger.
-- Incorporar pipeline CI/CD.
-- Agregar análisis estático de código.
-- Mejorar observabilidad y métricas.
-
----
-
-# 16. Ejecución rápida
+# 15. Ejecución rápida
 
 Para levantar el proyecto desde cero:
 

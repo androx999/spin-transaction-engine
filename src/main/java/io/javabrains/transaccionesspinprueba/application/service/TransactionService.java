@@ -12,6 +12,10 @@ import io.javabrains.transaccionesspinprueba.infrastructure.provider.dto.respons
 import io.javabrains.transaccionesspinprueba.infrastructure.provider.enums.ProviderStatus;
 import io.javabrains.transaccionesspinprueba.infrastructure.provider.exception.ProviderRejectedException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -57,7 +61,7 @@ public class TransactionService {
 
     private Transaction buildRejectedTransaction(CreateTransactionRequest request, ProviderRejectedException ex) {
         return new Transaction(
-                        UUID.randomUUID(),
+                null,
                         request.accountId(),
                         request.type(),
                         request.amount(),
@@ -93,7 +97,7 @@ public class TransactionService {
             );
         }
         return new Transaction(
-                UUID.randomUUID(),
+                null,
                 request.accountId(),
                 request.type(),
                 request.amount(),
@@ -146,5 +150,25 @@ public class TransactionService {
                     "Only MXN currency is supported"
             );
         }
+    }
+
+
+    public Page<TransactionResponse> getTranscations(String accountId,TransactionStatus status,TransactionType type,int page,int limit){
+
+        if (page < 0) {
+            throw new IllegalArgumentException(
+                    "Page must be greater than or equal to 0"
+            );
+        }
+
+        if (limit < 1 || limit > 100) {
+            throw new IllegalArgumentException(
+                    "Limit must be between 1 and 100"
+            );
+        }
+
+        Pageable pageable = PageRequest.of(page,limit, Sort.by(Sort.Direction.DESC,"createdAt"));
+
+        return transactionRepository.findAll(accountId,status,type,pageable).map(this::toResponse);
     }
 }
