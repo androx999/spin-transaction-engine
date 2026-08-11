@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 @FeignClient(name="transaction-provider",url="${provider.transaction.url}",configuration = TransactionProviderFeignConfig.class
 )
 public interface TransactionProviderClient {
-    @PostMapping("/transactions")
+    @PostMapping("/provider/v1/execute")
     ProviderTransactionResponse executeTransaction(
             @RequestBody ProviderTransactionRequest request);
 }

@@ -2,6 +2,7 @@ package io.javabrains.transaccionesspinprueba.infrastructure.persistence.reposit
 
 import io.javabrains.transaccionesspinprueba.infrastructure.persistence.entity.TransactionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.UUID;
 
@@ -12,5 +13,5 @@ import java.util.UUID;
  * Provee Operaciones CRUD incluyendo the filtering capabilities required by
  * the GET /transactions endpoint (accountId, status, type) with pagination.
  */
-public interface TransactionJpaRepository extends JpaRepository<TransactionEntity, UUID> {
+public interface TransactionJpaRepository extends JpaRepository<TransactionEntity, UUID>, JpaSpecificationExecutor<TransactionEntity> {
 }

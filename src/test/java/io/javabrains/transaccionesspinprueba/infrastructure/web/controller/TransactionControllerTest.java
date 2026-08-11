@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,10 +20,12 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -142,4 +146,77 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(jsonPath("$.message")
                         .value("Debit amount cannot exceed 10000.00"));
     }
+
+    @Test
+    void getTransactionAndReturn200() throws Exception{
+
+        TransactionResponse transaction = new TransactionResponse(
+                UUID.randomUUID(),
+                "acc-123456",
+                TransactionType.CREDIT,
+                new BigDecimal("1500.00"),
+                "MXN",
+                "Transferencia recibida",
+                TransactionStatus.EXECUTED,
+                "txn-789",
+                new BigDecimal("5500.00"),
+                Instant.parse("2026-08-10T15:00:00Z")
+        );
+
+        Page<TransactionResponse> page = new PageImpl<>(List.of(transaction));
+
+        when(transactionService.getTranscations(
+                any(),
+                any(),
+                any(),
+                anyInt(),
+                anyInt()
+        )).thenReturn(page);
+
+        mockMvc.perform(
+                get("/transactions")
+                        .param("accountId", "acc-123456")
+                        .param("status", "EXECUTED")
+                        .param("type", "CREDIT")
+                        .param("page", "0")
+                        .param("limit", "20")
+        )   .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].accountId")
+                        .value("acc-123456"))
+                .andExpect(jsonPath("$.content[0].status")
+                        .value("EXECUTED"))
+                .andExpect(jsonPath("$.content[0].type")
+                        .value("CREDIT"));
+
+
+    }
+
+    @Test
+    void return400WhenPaginationIsInvalid() throws Exception {
+
+        when(transactionService.getTranscations(
+                any(),
+                any(),
+                any(),
+                anyInt(),
+                anyInt()
+        )).thenThrow(
+                new IllegalArgumentException(
+                        "Limit must be between 1 and 100"
+                )
+        );
+
+        mockMvc.perform(
+                        get("/transactions")
+                                .param("page", "0")
+                                .param("limit", "0")
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message")
+                        .value("Limit must be between 1 and 100"));
+    }
+
+
+
 }
